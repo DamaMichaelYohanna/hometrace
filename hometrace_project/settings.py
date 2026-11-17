@@ -86,10 +86,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'hometrace_project.wsgi.application'
 
 # Database Configuration
-# Supports PostgreSQL via DATABASE_URL and defaults seamlessly to SQLite for local development
+# PostgreSQL is supported when DATABASE_URL is set; otherwise use the bundled SQLite database.
 DATABASE_URL = os.getenv('DATABASE_URL')
-if IS_VERCEL and not DATABASE_URL:
-    raise ImproperlyConfigured('DATABASE_URL must be set to a persistent database in Vercel.')
 
 if DATABASE_URL:
     import dj_database_url

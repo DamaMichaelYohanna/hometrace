@@ -190,8 +190,8 @@ python manage.py test
 
 For Vercel deployment:
 1. Import the repository into Vercel. The included `vercel.json` and `api/index.py` configure the Django serverless entrypoint.
-2. Add `SECRET_KEY`, `DATABASE_URL` (a persistent PostgreSQL database), `ALLOWED_HOSTS`, `PAYSTACK_PUBLIC_KEY`, and `PAYSTACK_SECRET_KEY` as Vercel environment variables.
-3. Set `CLOUDINARY_URL` for persistent property and profile uploads. Vercel's filesystem is ephemeral, so local SQLite and local media storage are not suitable for production.
+2. Add `SECRET_KEY`, `ALLOWED_HOSTS`, `PAYSTACK_PUBLIC_KEY`, and `PAYSTACK_SECRET_KEY` as Vercel environment variables. `DATABASE_URL` is optional; without it, Vercel uses the bundled `db.sqlite3`.
+3. Set `CLOUDINARY_URL` for persistent property and profile uploads. Vercel's filesystem is ephemeral, so SQLite writes and local media uploads will not persist between deployments or instances. Use PostgreSQL and Cloudinary for production data.
 4. Static files are collected automatically during the Vercel build.
 
 For other production platforms (e.g. on Ubuntu VPS, Render, Railway, or AWS):
