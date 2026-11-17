@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found (404) | Hometrace{% endblock %}
+
+{% block content %}
+<div class="min-h-[65vh] flex items-center justify-center px-4 py-16">
+  <div class="max-w-md w-full text-center">
+    <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mb-4">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <span class="text-xs font-bold uppercase tracking-wider text-brand-teal">404 Error</span>
+    <h1 class="text-2xl font-extrabold text-slate-900 mt-1">Listing or Page Not Found</h1>
+    <p class="text-sm text-slate-600 mt-2">The property listing or URL you are trying to visit may have been archived, sold, or moved.</p>
+    <div class="mt-6 flex items-center justify-center space-x-3">
+      <a href="{% url 'property_list' %}" class="px-5 py-2.5 rounded-xl bg-brand-teal text-white font-bold text-sm shadow hover:bg-teal-700 transition-colors">
+        Browse Properties
+      </a>
+      <a href="{% url 'home' %}" class="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-800 font-semibold text-sm hover:bg-slate-200 transition-colors">
+        Homepage
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

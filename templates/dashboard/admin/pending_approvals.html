@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pending Approvals Queue | Hometrace Admin{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <div class="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+          <a href="{% url 'admin_overview' %}" class="hover:underline">Admin Command</a>
+          <span>/</span>
+          <span class="text-slate-800 font-bold">Pending Moderation</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Pending Property Approvals</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Review new and edited listings before releasing them to the public marketplace</p>
+      </div>
+
+      <div>
+        <span class="px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-bold text-xs">
+          {{ properties|length }} Pending Listing{{ properties|length|pluralize }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Approvals List Cards -->
+    <div class="space-y-6">
+      {% for prop in properties %}
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          
+          <div class="flex items-start space-x-4 min-w-0">
+            <img src="{{ prop.primary_image_url }}" alt="{{ prop.title }}" class="w-20 h-20 rounded-2xl object-cover flex-shrink-0" onerror="this.onerror=null;this.src='/static/icons/property-placeholder.svg';">
+
+            <div class="min-w-0">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {% if prop.listing_purpose == 'for_sale' %}bg-blue-50 text-blue-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">
+                  {{ prop.get_listing_purpose_display }}
+                </span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase">{{ prop.category.name }}</span>
+                <span class="text-slate-400">&bull;</span>
+                <span class="text-[11px] text-slate-400">Submitted {{ prop.created_at|timesince }} ago</span>
+              </div>
+
+              <h2 class="text-base font-bold text-slate-900 mt-1">
+                <a href="{% url 'property_detail' slug=prop.slug %}" target="_blank" class="hover:text-brand-teal transition-colors">
+                  {{ prop.title }}
+                </a>
+              </h2>
+
+              <p class="text-xs text-slate-500 mt-0.5">
+                {{ prop.neighbourhood }}, {{ prop.city }}, {{ prop.state }} State &bull; <strong class="text-slate-900 text-sm font-extrabold">{{ prop.formatted_price }}</strong>
+              </p>
+
+              <div class="mt-2 flex items-center space-x-3 text-xs text-slate-600">
+                <span>Agent: <strong class="text-slate-900">{{ prop.agent.full_name }}</strong></span>
+                <span>&bull;</span>
+                <span>{{ prop.bedrooms }} Beds &bull; {{ prop.bathrooms }} Baths</span>
+                <span>&bull;</span>
+                <span>{{ prop.images.count }} Photos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Moderation Decision Buttons -->
+          <div class="flex items-center space-x-3 flex-shrink-0 w-full lg:w-auto pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+            <a href="{% url 'property_detail' slug=prop.slug %}" target="_blank" class="flex-1 lg:flex-initial px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs text-center transition-colors">
+              Inspect Listing
+            </a>
+            <a href="{% url 'admin_approve_property' property_id=prop.id %}" class="flex-1 lg:flex-initial px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs text-center shadow-xs transition-colors">
+              Approve & Publish
+            </a>
+            <button onclick="openRejectModal('{{ prop.id }}', '{{ prop.title|escapejs }}')" class="flex-1 lg:flex-initial px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition-colors">
+              Reject
+            </button>
+          </div>
+
+        </div>
+      {% empty %}
+        <div class="py-16 text-center bg-white rounded-3xl border border-slate-200">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-base font-bold text-slate-900">Queue is clear!</h3>
+          <p class="text-xs text-slate-500 mt-1">There are no property listings pending administrative review at this time.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Rejection Modal -->
+<div id="admin-reject-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+    <h3 class="text-base font-bold text-slate-900 mb-2">Reject Property Listing</h3>
+    <p id="reject-prop-title" class="text-xs font-semibold text-slate-600 mb-4"></p>
+
+    <form id="reject-form" method="POST" action="">
+      {% csrf_token %}
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">State Reason for Rejection</label>
+      <textarea name="reason" rows="3" required placeholder="Describe the reason: e.g. Price requires verification, photo quality blurry, land title document required..." class="form-input text-xs"></textarea>
+      
+      <div class="mt-4 flex justify-end space-x-2">
+        <button type="button" onclick="document.getElementById('admin-reject-modal').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold text-slate-700">Cancel</button>
+        <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 text-xs font-bold text-white shadow">Confirm Rejection</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openRejectModal(propId, propTitle) {
+    const modal = document.getElementById('admin-reject-modal');
+    const titleEl = document.getElementById('reject-prop-title');
+    const form = document.getElementById('reject-form');
+    titleEl.textContent = propTitle;
+    form.action = `/dashboard/admin-portal/approvals/${propId}/reject/`;
+    modal.classList.remove('hidden');
+  }
+</script>
+{% endblock %}

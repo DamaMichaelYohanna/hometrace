@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>{% block title %}Hometrace | Real Estate Property Listing & Search in Nigeria{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Discover, search, rent and buy verified real estate properties across Nigeria with Hometrace Progressive Web Application.{% endblock %}">
+  
+  <!-- PWA & Mobile Optimization -->
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hometrace">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon-192x192.png' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0F172A',
+              slate: '#1E293B',
+              teal: '#0D9488',
+              'teal-light': '#14B8A6',
+              emerald: '#10B981',
+              amber: '#D97706',
+              'amber-light': '#F59E0B',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Design Tokens & Styles -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen text-slate-800 antialiased pb-16 md:pb-0">
+
+  <!-- Offline Status Bar -->
+  <div id="offline-indicator" class="hidden bg-amber-500 text-slate-900 text-xs font-semibold py-1.5 px-4 text-center z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-12.728 0m0 0l2.829-2.829m-2.829 2.829L3 21m2.828-15.536a9 9 0 0112.728 0"/></svg>
+      <span>You are currently offline. Showing cached content.</span>
+    </div>
+  </div>
+
+  <!-- Global Header & Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <!-- Django Flash Messages Alert System -->
+  {% if messages %}
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+    {% for message in messages %}
+      <div class="p-4 rounded-xl mb-3 flex items-start justify-between shadow-sm border transition-all duration-300 {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% elif message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800{% elif message.tags == 'warning' %}bg-amber-50 border-amber-200 text-amber-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+        <div class="flex items-center space-x-3">
+          {% if message.tags == 'success' %}
+            <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% elif message.tags == 'error' %}
+            <svg class="w-5 h-5 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% else %}
+            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          {% endif %}
+          <span class="text-sm font-medium">{{ message }}</span>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 ml-4">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main Content Block -->
+  <main class="flex-grow">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- PWA Install Banner Component -->
+  {% include 'components/pwa_install_banner.html' %}
+
+  <!-- Global Footer -->
+  {% include 'components/footer.html' %}
+
+  <!-- Mobile Bottom Navigation (PWA UX) -->
+  <nav class="md:hidden mobile-bottom-nav">
+    <a href="{% url 'home' %}" class="flex flex-col items-center justify-center text-xs {% if request.resolver_match.url_name == 'home' %}text-brand-teal font-semibold{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="{% url 'search' %}" class="flex flex-col items-center justify-center text-xs {% if request.resolver_match.url_name == 'search' %}text-brand-teal font-semibold{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <span>Search</span>
+    </a>
+    <a href="{% url 'favorites_list' %}" class="relative flex flex-col items-center justify-center text-xs {% if request.resolver_match.url_name == 'favorites_list' %}text-brand-teal font-semibold{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      <span>Saved</span>
+      <span class="favorites-count-badge absolute -top-1 right-2 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold {% if user_favorites_count == 0 %}hidden{% endif %}">
+        {{ user_favorites_count }}
+      </span>
+    </a>
+    <a href="{% url 'inbox' %}" class="relative flex flex-col items-center justify-center text-xs {% if request.resolver_match.url_name == 'inbox' %}text-brand-teal font-semibold{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      <span>Chat</span>
+      {% if unread_messages_count > 0 %}
+      <span class="absolute -top-1 right-2 bg-brand-teal text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">
+        {{ unread_messages_count }}
+      </span>
+      {% endif %}
+    </a>
+    <a href="{% if user.is_authenticated %}{% url 'dashboard_dispatch' %}{% else %}{% url 'login' %}{% endif %}" class="flex flex-col items-center justify-center text-xs text-slate-500 hover:text-slate-900">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      <span>{% if user.is_authenticated %}Portal{% else %}Login{% endif %}</span>
+    </a>
+  </nav>
+
+  <!-- Client JavaScript -->
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/pwa.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

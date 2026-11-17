@@ -1,0 +1,86 @@
+{% load static %}
+<footer class="bg-brand-navy text-slate-300 pt-16 pb-12 border-t border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
+      
+      <!-- Brand Column -->
+      <div class="lg:col-span-2 space-y-4">
+        <a href="{% url 'home' %}" class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 flex items-center justify-center text-brand-navy font-black shadow-md">
+            <svg class="w-6 h-6 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          </div>
+          <span class="text-2xl font-extrabold text-white tracking-tight">Home<span class="text-teal-400">trace</span></span>
+        </a>
+        <p class="text-slate-400 text-sm leading-relaxed max-w-sm">
+          Nigeria's trusted real estate marketplace connecting verified agents and property seekers in Keffi, Nasarawa State.
+        </p>
+        <div class="flex items-center space-x-3 pt-2">
+          <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-800 text-teal-400 text-xs font-semibold border border-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Keffi, Nasarawa State Hub</span>
+          </span>
+          <span class="text-xs text-slate-400">Currency: NGN (₦)</span>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Quick Links</h3>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="{% url 'home' %}" class="text-slate-400 hover:text-white transition-colors">Home</a></li>
+          <li><a href="{% url 'property_list' %}" class="text-slate-400 hover:text-white transition-colors">All Properties</a></li>
+          <li><a href="{% url 'search' %}?purpose=for_rent" class="text-slate-400 hover:text-white transition-colors">Properties for Rent</a></li>
+          <li><a href="{% url 'search' %}?purpose=for_sale" class="text-slate-400 hover:text-white transition-colors">Properties for Sale</a></li>
+          <li><a href="{% url 'register' %}?role=agent" class="text-teal-400 hover:text-teal-300 font-semibold transition-colors">Agent Registration</a></li>
+        </ul>
+      </div>
+
+      <!-- Prime Keffi Locations -->
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Keffi Locations</h3>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="{% url 'search' %}?q=Angwan+Lambu" class="text-slate-400 hover:text-white transition-colors">Angwan Lambu (NSUK Area)</a></li>
+          <li><a href="{% url 'search' %}?q=GRA+Keffi" class="text-slate-400 hover:text-white transition-colors">GRA Keffi (Executive Zone)</a></li>
+          <li><a href="{% url 'search' %}?q=FMC+Corridor" class="text-slate-400 hover:text-white transition-colors">FMC Hospital Corridor</a></li>
+          <li><a href="{% url 'search' %}?q=Abuja-Keffi+Expressway" class="text-slate-400 hover:text-white transition-colors">Abuja-Keffi Expressway</a></li>
+          <li><a href="{% url 'search' %}?q=High+Court+Road" class="text-slate-400 hover:text-white transition-colors">High Court Road</a></li>
+          <li><a href="{% url 'search' %}?q=Pyanku" class="text-slate-400 hover:text-white transition-colors">Pyanku & University Extension</a></li>
+        </ul>
+      </div>
+
+      <!-- Company & Legal -->
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Trust & Legal</h3>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="{% url 'about' %}" class="text-slate-400 hover:text-white transition-colors">About Us</a></li>
+          <li><a href="{% url 'contact' %}" class="text-slate-400 hover:text-white transition-colors">Contact Support</a></li>
+          <li><a href="{% url 'privacy' %}" class="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
+          <li><a href="{% url 'terms' %}" class="text-slate-400 hover:text-white transition-colors">Terms of Service</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Regulatory & Disclaimer Banner -->
+    <div class="mt-8 text-xs text-slate-500 leading-relaxed border-b border-slate-800/80 pb-6">
+      <p class="font-semibold text-slate-400 mb-1">Notice:</p>
+      Hometrace connects property seekers with verified agents. Please conduct independent physical inspections and verify legal title documents before completing real estate transactions.
+    </div>
+
+    <!-- Bottom Copyright & Academic Credit -->
+    <div class="mt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 space-y-4 sm:space-y-0">
+      <div>
+        &copy; {% now "Y" %} Hometrace PWA. All rights reserved. Built for Keffi &amp; Nasarawa State Real Estate.
+      </div>
+      <div class="flex items-center space-x-4">
+        <span>Powered by Django & Tailwind CSS</span>
+        <span>&bull;</span>
+        <span>Secure Paystack Integration</span>
+        <span>&bull;</span>
+        <button onclick="triggerPwaInstall()" class="pwa-install-trigger text-teal-400 hover:underline">Install App</button>
+      </div>
+    </div>
+
+  </div>
+</footer>

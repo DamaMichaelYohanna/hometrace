@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Listing: {{ property.title }} | Hometrace{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Edit Property Listing</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Update specifications, photos, and availability status</p>
+      </div>
+      <div>
+        <a href="{% url 'property_detail' slug=property.slug %}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold shadow-sm hover:bg-slate-50">
+          View Live Page
+        </a>
+      </div>
+    </div>
+
+    <div class="bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-sm">
+      <form method="POST" enctype="multipart/form-data" class="space-y-8">
+        {% csrf_token %}
+
+        <!-- Basic Info -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">1. Basic Information</h2>
+          <div class="mt-4 space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Title</label>
+              {{ form.title }}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Category</label>
+                {{ form.category }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Purpose</label>
+                {{ form.listing_purpose }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Type</label>
+                {{ form.property_type }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">2. Location</h2>
+          <div class="mt-4 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">State</label>
+                {{ form.state }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">LGA</label>
+                {{ form.lga }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">City</label>
+                {{ form.city }}
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Neighbourhood</label>
+                {{ form.neighbourhood }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Street Address</label>
+                {{ form.street_address }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">3. Pricing</h2>
+          <div class="mt-4 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Price (₦)</label>
+                {{ form.price }}
+              </div>
+              <div id="rental-frequency-group">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Rental Frequency</label>
+                {{ form.rental_frequency }}
+              </div>
+            </div>
+            <div class="flex items-center space-x-2 pt-1">
+              {{ form.is_negotiable }}
+              <label for="{{ form.is_negotiable.id_for_label }}" class="text-xs text-slate-700 font-semibold cursor-pointer">
+                Price is negotiable
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Specifications -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">4. Specifications</h2>
+          <div class="mt-4 space-y-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Bedrooms</label>
+                {{ form.bedrooms }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Bathrooms</label>
+                {{ form.bathrooms }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Toilets</label>
+                {{ form.toilets }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Parking Spaces</label>
+                {{ form.parking_spaces }}
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Size (sqm)</label>
+                {{ form.property_size }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Furnished Status</label>
+                {{ form.furnished_status }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Condition</label>
+                {{ form.property_condition }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amenities -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">5. Amenities</h2>
+          <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {{ form.amenities }}
+          </div>
+        </div>
+
+        <!-- Media & Description -->
+        <div>
+          <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">6. Description & Media</h2>
+          <div class="mt-4 space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Description</label>
+              {{ form.description }}
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Change Featured Cover Photo</label>
+                {{ form.featured_image }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Upload Additional Photos</label>
+                {{ image_form.images }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit & Actions -->
+        <div class="pt-6 border-t border-slate-100 flex items-center justify-between">
+          <a href="{% url 'property_delete' slug=property.slug %}" class="text-xs font-bold text-rose-600 hover:text-rose-700">
+            Delete Listing
+          </a>
+          <div class="flex items-center space-x-3">
+            <a href="{% url 'agent_properties' %}" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">
+              Cancel
+            </a>
+            <button type="submit" class="px-7 py-3 rounded-xl bg-brand-teal hover:bg-teal-700 text-white font-bold text-sm shadow">
+              Save Changes
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

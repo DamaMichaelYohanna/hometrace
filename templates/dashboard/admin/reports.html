@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Property Reports Moderation | Hometrace Admin{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8 flex items-center justify-between">
+      <div>
+        <div class="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+          <a href="{% url 'admin_overview' %}" class="hover:underline">Admin Command</a>
+          <span>/</span>
+          <span class="text-slate-800 font-bold">Reports</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Reported Properties Moderation</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Review flagged listings for fraud, pricing manipulation, and policy infractions</p>
+      </div>
+
+      <span class="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 font-bold text-xs">
+        {{ reports|length }} Flagged Report{{ reports|length|pluralize }}
+      </span>
+    </div>
+
+    <!-- Reports Feed -->
+    <div class="space-y-4">
+      {% for rep in reports %}
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-2 flex-1">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-50 text-rose-700 border border-rose-200">
+                {{ rep.get_reason_display }}
+              </span>
+              <span class="text-slate-400 text-xs">&bull;</span>
+              <span class="text-xs text-slate-500">Reported by: <strong class="text-slate-800">{{ rep.reporter_name|default:"Anonymous" }}</strong> ({{ rep.reporter_email|default:"No email" }})</span>
+              <span class="text-slate-400 text-xs">&bull;</span>
+              <span class="text-[11px] text-slate-400">{{ rep.created_at|timesince }} ago</span>
+            </div>
+
+            <h3 class="text-sm font-bold text-slate-900">
+              Reported Listing: <a href="{% url 'property_detail' slug=rep.property.slug %}" target="_blank" class="text-brand-teal hover:underline">{{ rep.property.title }}</a>
+              <span class="text-xs font-normal text-slate-500 ml-1">(Agent: {{ rep.property.agent.full_name }})</span>
+            </h3>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed">
+              <strong class="text-slate-900 block mb-0.5">Reporter's Statement:</strong>
+              {{ rep.description }}
+            </div>
+          </div>
+
+          <!-- Moderation Actions -->
+          <div class="flex items-center space-x-2 flex-shrink-0">
+            {% if rep.status == 'pending' %}
+              <a href="{% url 'admin_report_action' report_id=rep.id action='dismiss' %}" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors">
+                Dismiss
+              </a>
+              <a href="{% url 'admin_report_action' report_id=rep.id action='archive' %}" class="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow transition-colors">
+                Archive Listing
+              </a>
+            {% else %}
+              <span class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-slate-100 text-slate-600">
+                {{ rep.get_status_display }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div class="py-16 text-center bg-white rounded-3xl border border-slate-200">
+          <p class="text-xs text-slate-400">No reported properties currently logged. Clean record!</p>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

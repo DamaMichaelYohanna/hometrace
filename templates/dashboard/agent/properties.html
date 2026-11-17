@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Listings Management | Hometrace Agent Portal{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">My Property Listings</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Manage status, edit specifications, and track review approvals
+        </p>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <a href="{% url 'property_create' %}"
+          class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl bg-brand-teal hover:bg-teal-700 text-white shadow transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add New Property</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="flex items-center space-x-2 pb-6 overflow-x-auto no-scrollbar text-xs font-bold">
+      <a href="?status=all"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'all' or not current_status %}bg-slate-900 text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        All
+      </a>
+      <a href="?status=published"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'published' %}bg-brand-teal text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        Published
+      </a>
+      <a href="?status=pending"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'pending' %}bg-amber-500 text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        Pending Review
+      </a>
+      <a href="?status=rented"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'rented' %}bg-blue-600 text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        Rented
+      </a>
+      <a href="?status=sold"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'sold' %}bg-purple-600 text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        Sold
+      </a>
+      <a href="?status=rejected"
+        class="px-4 py-2 rounded-xl transition-colors {% if current_status == 'rejected' %}bg-rose-600 text-white{% else %}bg-white text-slate-600 hover:bg-slate-100 border border-slate-200{% endif %}">
+        Rejected
+      </a>
+    </div>
+
+    <!-- Listings Table Card -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead
+            class="bg-slate-50 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="py-3.5 px-6">Property</th>
+              <th class="py-3.5 px-6">Category</th>
+              <th class="py-3.5 px-6">Price (NGN)</th>
+              <th class="py-3.5 px-6">Availability</th>
+              <th class="py-3.5 px-6">Review Status</th>
+              <th class="py-3.5 px-6 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+            {% for prop in properties %}
+            <tr class="hover:bg-slate-50 transition-colors">
+
+              <!-- Title & Thumbnail -->
+              <td class="py-4 px-6">
+                <div class="flex items-center space-x-3.5">
+                  <img src="{{ prop.primary_image_url }}" alt="{{ prop.title }}"
+                    class="w-12 h-12 rounded-xl object-cover flex-shrink-0"
+                    onerror="this.onerror=null;this.src='/static/icons/property-placeholder.svg';">
+                  <div class="min-w-0">
+                    <a href="{% url 'property_detail' slug=prop.slug %}"
+                      class="font-bold text-slate-900 hover:text-brand-teal transition-colors block truncate max-w-xs">
+                      {{ prop.title }}
+                    </a>
+                    <span class="text-[11px] text-slate-400 block mt-0.5">{{ prop.neighbourhood }}, {{ prop.city }}, {{
+                      prop.state }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Category -->
+              <td class="py-4 px-6 text-slate-600 font-semibold">
+                {{ prop.category.name }}
+              </td>
+
+              <!-- Price -->
+              <td class="py-4 px-6 font-extrabold text-slate-900">
+                {{ prop.formatted_price }}
+              </td>
+
+              <!-- Availability Dropdown Toggle -->
+              <td class="py-4 px-6">
+                <div class="relative inline-block text-left group">
+                  <span
+                    class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-bold cursor-pointer {% if prop.availability_status == 'available' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif prop.availability_status == 'rented' %}bg-blue-50 text-blue-700 border border-blue-200{% elif prop.availability_status == 'sold' %}bg-purple-50 text-purple-700 border border-purple-200{% else %}bg-slate-100 text-slate-700{% endif %}">
+                    <span>{{ prop.get_availability_status_display }}</span>
+                    <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+
+                  <!-- Quick Toggle Dropdown -->
+                  <div
+                    class="hidden group-hover:block absolute left-0 mt-1 w-32 rounded-xl bg-white shadow-xl border border-slate-100 py-1.5 z-20">
+                    <a href="{% url 'property_status_toggle' slug=prop.slug new_status='available' %}"
+                      class="block px-3 py-1.5 text-[11px] text-slate-700 hover:bg-slate-50 font-semibold">Mark
+                      Available</a>
+                    <a href="{% url 'property_status_toggle' slug=prop.slug new_status='under_offer' %}"
+                      class="block px-3 py-1.5 text-[11px] text-slate-700 hover:bg-slate-50 font-semibold">Under
+                      Offer</a>
+                    <a href="{% url 'property_status_toggle' slug=prop.slug new_status='rented' %}"
+                      class="block px-3 py-1.5 text-[11px] text-slate-700 hover:bg-slate-50 font-semibold">Mark
+                      Rented</a>
+                    <a href="{% url 'property_status_toggle' slug=prop.slug new_status='sold' %}"
+                      class="block px-3 py-1.5 text-[11px] text-slate-700 hover:bg-slate-50 font-semibold">Mark Sold</a>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Review Status -->
+              <td class="py-4 px-6">
+                {% if prop.approval_status == 'approved' %}
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                  Approved
+                </span>
+                {% elif prop.approval_status == 'pending' %}
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  Pending
+                </span>
+                {% elif prop.approval_status == 'rejected' %}
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200"
+                  title="{{ prop.rejection_reason }}">
+                  Rejected
+                </span>
+                {% else %}
+                <span
+                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">
+                  {{ prop.get_approval_status_display }}
+                </span>
+                {% endif %}
+              </td>
+
+              <!-- Actions -->
+              <td class="py-4 px-6 text-right whitespace-nowrap space-x-2">
+                <a href="{% url 'property_detail' slug=prop.slug %}"
+                  class="text-slate-500 hover:text-slate-900 font-bold">View</a>
+                <a href="{% url 'property_edit' slug=prop.slug %}"
+                  class="text-brand-teal font-bold hover:underline">Edit</a>
+                <a href="{% url 'property_delete' slug=prop.slug %}"
+                  class="text-rose-500 hover:text-rose-700 font-bold">Delete</a>
+              </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="py-14 text-center text-slate-400">
+                No properties found in this category. Click "Add New Property" to create one.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

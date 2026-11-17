@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Taxonomy Management: Categories & Amenities | Hometrace Admin{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8">
+      <div class="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+        <a href="{% url 'admin_overview' %}" class="hover:underline">Admin Command</a>
+        <span>/</span>
+        <span class="text-slate-800 font-bold">Taxonomy</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Categories & Amenities Taxonomy</h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">Configure property classifications and Nigerian infrastructure feature options</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Categories Column -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-6">
+        <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
+          <span>Property Categories ({{ categories|length }})</span>
+        </h2>
+
+        <!-- Add Category Form -->
+        <form method="POST" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          {% csrf_token %}
+          <input type="hidden" name="action_type" value="add_category">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Category Name</label>
+              <input type="text" name="name" required placeholder="e.g. Penthouse, Terrace" class="form-input text-xs py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Icon Name</label>
+              <input type="text" name="icon_name" value="home" class="form-input text-xs py-2">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Description</label>
+            <input type="text" name="description" placeholder="Short description..." class="form-input text-xs py-2">
+          </div>
+          <button type="submit" class="w-full py-2 rounded-xl bg-brand-teal text-white font-bold text-xs shadow-xs">
+            + Add Category
+          </button>
+        </form>
+
+        <!-- Existing Categories List -->
+        <div class="divide-y divide-slate-100 text-xs">
+          {% for cat in categories %}
+            <div class="py-3 flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">{{ cat.name }}</span>
+                <span class="text-slate-400 text-[11px]">{{ cat.description|default:"No description" }}</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700">
+                {{ cat.properties.count }} listing{{ cat.properties.count|pluralize }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Amenities Column -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-6">
+        <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
+          <span>Amenities & Features ({{ amenities|length }})</span>
+        </h2>
+
+        <!-- Add Amenity Form -->
+        <form method="POST" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          {% csrf_token %}
+          <input type="hidden" name="action_type" value="add_amenity">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Amenity Name</label>
+              <input type="text" name="name" required placeholder="e.g. 24/7 Solar Inverter" class="form-input text-xs py-2">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Category</label>
+              <select name="category" class="form-input text-xs py-2">
+                <option value="utility">Power & Utilities</option>
+                <option value="security">Security & Safety</option>
+                <option value="comfort">Comfort & Living</option>
+                <option value="luxury">Luxury & Recreation</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-2 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-xs">
+            + Add Amenity
+          </button>
+        </form>
+
+        <!-- Existing Amenities List -->
+        <div class="divide-y divide-slate-100 text-xs max-h-[400px] overflow-y-auto pr-1">
+          {% for am in amenities %}
+            <div class="py-2.5 flex items-center justify-between">
+              <span class="font-bold text-slate-900">{{ am.name }}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 uppercase">
+                {{ am.get_category_display }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

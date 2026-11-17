@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paystack Test Sandbox | Hometrace{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-slate-50 min-h-[85vh] flex items-center justify-center px-4">
+  <div class="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-slate-200 text-center">
+    
+    <!-- Paystack Brand Badge -->
+    <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-brand-teal text-xs font-bold mb-4">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+      <span>Paystack Sandbox Test Mode</span>
+    </div>
+
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Complete Test Payment</h1>
+    <p class="text-xs text-slate-500 mt-1 mb-6">Student Project Defense & Sandbox Demonstration</p>
+
+    <!-- Transaction Summary -->
+    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-left text-xs space-y-2 mb-6">
+      <div class="flex justify-between">
+        <span class="text-slate-500">Reference:</span>
+        <span class="font-mono font-bold text-slate-800">{{ payment.reference }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-500">Purpose:</span>
+        <span class="font-bold text-slate-800">{{ payment.get_purpose_display }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-500">Amount:</span>
+        <span class="font-extrabold text-brand-navy text-sm">₦{{ payment.amount|floatformat:2 }} NGN</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-slate-500">User:</span>
+        <span class="font-semibold text-slate-800">{{ payment.user.full_name }}</span>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <!-- Simulate Success Button -->
+      <a href="{% url 'payment_callback' %}?reference={{ payment.reference }}&demo=1" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center space-x-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Simulate Successful Payment (Authorize)</span>
+      </a>
+
+      <!-- Simulate Decline Button -->
+      <a href="{% url 'payment_callback' %}?reference={{ payment.reference }}&demo=0" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-rose-600 font-semibold text-xs transition-colors flex items-center justify-center space-x-2">
+        <span>Simulate Card Decline / Failure</span>
+      </a>
+    </div>
+
+    <p class="text-[11px] text-slate-400 mt-6 leading-tight">
+      This interactive test harness verifies that backend fulfillment, notification dispatch, and receipt generation execute with 100% fidelity.
+    </p>
+
+  </div>
+</div>
+{% endblock %}

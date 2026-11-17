@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agent Dashboard Overview | Hometrace Nigeria{% endblock %}
+
+{% block content %}
+<div class="py-8 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Top Greeting Banner -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Agent Portal: {{ agent_profile.agency_name|default:user.full_name }}</h1>
+          {% if agent_profile.is_verified_agent %}
+            <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-teal-50 text-brand-teal text-xs font-bold border border-teal-200">
+              <svg class="w-3.5 h-3.5 text-brand-teal" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span>Verified Agency</span>
+            </span>
+          {% endif %}
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Manage listings, monitor prospective buyer inquiries, and update property availability</p>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <a href="{% url 'property_create' %}" class="inline-flex items-center space-x-2 text-xs font-bold px-4 py-2.5 rounded-xl bg-brand-teal hover:bg-teal-700 text-white shadow transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Add New Listing</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Agent KPI Cards Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+      
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total Listings</span>
+        <span class="text-2xl font-black text-slate-900 mt-1 block">{{ total_properties }}</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">Published</span>
+        <span class="text-2xl font-black text-emerald-600 mt-1 block">{{ published_count }}</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-500 block">Pending Review</span>
+        <span class="text-2xl font-black text-amber-500 mt-1 block">{{ pending_count }}</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block">Rented</span>
+        <span class="text-2xl font-black text-blue-600 mt-1 block">{{ rented_count }}</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-purple-600 block">Sold</span>
+        <span class="text-2xl font-black text-purple-600 mt-1 block">{{ sold_count }}</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-brand-teal block">Enquiries</span>
+        <span class="text-2xl font-black text-brand-teal mt-1 block">{{ total_enquiries }}</span>
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Recent Properties Table (2 Cols) -->
+      <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">Recent Property Listings</h2>
+          <a href="{% url 'agent_properties' %}" class="text-xs font-bold text-brand-teal hover:underline">View All My Listings &rarr;</a>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+              <tr>
+                <th class="py-3 px-5">Property</th>
+                <th class="py-3 px-5">Price (NGN)</th>
+                <th class="py-3 px-5">Status</th>
+                <th class="py-3 px-5">Review</th>
+                <th class="py-3 px-5 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+              {% for prop in recent_properties %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                  <td class="py-3.5 px-5">
+                    <div class="flex items-center space-x-3">
+                      <img src="{{ prop.primary_image_url }}" alt="{{ prop.title }}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0" onerror="this.onerror=null;this.src='/static/icons/property-placeholder.svg';">
+                      <div class="min-w-0">
+                        <span class="font-bold text-slate-900 block truncate max-w-xs">{{ prop.title }}</span>
+                        <span class="text-[11px] text-slate-400 block">{{ prop.city }}, {{ prop.state }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-3.5 px-5 font-bold text-slate-900">
+                    {{ prop.formatted_price }}
+                  </td>
+                  <td class="py-3.5 px-5">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if prop.availability_status == 'available' %}bg-emerald-50 text-emerald-700{% elif prop.availability_status == 'rented' %}bg-blue-50 text-blue-700{% else %}bg-purple-50 text-purple-700{% endif %}">
+                      {{ prop.get_availability_status_display }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-5">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if prop.approval_status == 'approved' %}bg-teal-50 text-teal-700{% elif prop.approval_status == 'pending' %}bg-amber-50 text-amber-700{% else %}bg-rose-50 text-rose-700{% endif %}">
+                      {{ prop.get_approval_status_display }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-5 text-right whitespace-nowrap">
+                    <a href="{% url 'property_detail' slug=prop.slug %}" class="text-slate-500 hover:text-slate-900 font-bold mr-2">View</a>
+                    <a href="{% url 'property_edit' slug=prop.slug %}" class="text-brand-teal font-bold hover:underline">Edit</a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="py-10 text-center text-slate-400">
+                    No properties listed yet. Click "Add New Listing" to publish.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Inquiries Received (1 Col) -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <h2 class="text-base font-bold text-slate-900">Client Inquiries</h2>
+            <a href="{% url 'agent_enquiries' %}" class="text-xs font-bold text-brand-teal hover:underline">All &rarr;</a>
+          </div>
+
+          <div class="mt-4 space-y-4">
+            {% for enq in recent_enquiries %}
+              <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-slate-900">{{ enq.buyer.full_name }}</span>
+                  <span class="text-[10px] text-slate-400">{{ enq.created_at|timesince }} ago</span>
+                </div>
+                <p class="text-brand-teal font-semibold mt-1 truncate">{{ enq.property.title }}</p>
+                <p class="text-slate-600 mt-1 line-clamp-2">{{ enq.message }}</p>
+              </div>
+            {% empty %}
+              <p class="text-xs text-slate-400 text-center py-8">No property enquiries yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-slate-100">
+          <a href="{% url 'inbox' %}" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow text-center block hover:bg-slate-800 transition-colors">
+            Open Chat Inbox
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

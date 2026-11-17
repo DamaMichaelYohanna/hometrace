@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administrator System Command Center | Hometrace Nigeria{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">System Administrator</span>
+          <span class="text-xs text-slate-400">&bull;</span>
+          <span class="text-xs font-bold text-slate-500">Master Administration Portal</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">Hometrace Platform Governance</h1>
+      </div>
+
+      <!-- Quick Nav Action Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <a href="{% url 'admin_pending_approvals' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xs shadow-sm transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>Pending Approvals ({{ pending_count }})</span>
+        </a>
+        <a href="{% url 'admin_users' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 shadow-sm transition-colors">
+          <span>Manage Users</span>
+        </a>
+        <a href="{% url 'admin_reports' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-rose-600 font-bold text-xs hover:bg-slate-50 shadow-sm transition-colors">
+          <span>Reports</span>
+        </a>
+        <a href="{% url 'admin_transactions' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 shadow-sm transition-colors">
+          <span>Ledger</span>
+        </a>
+        <a href="{% url 'admin_taxonomy' %}" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 shadow-sm transition-colors">
+          <span>Taxonomy</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Platform KPI Matrix Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+      
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total Users</span>
+        <span class="text-2xl font-black text-slate-900 mt-1 block">{{ total_users }}</span>
+        <span class="text-[10px] text-slate-400 mt-0.5 block">{{ total_agents }} Agents &bull; {{ total_buyers }} Buyers</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Total Properties</span>
+        <span class="text-2xl font-black text-brand-navy mt-1 block">{{ total_properties }}</span>
+        <span class="text-[10px] text-emerald-600 font-semibold mt-0.5 block">{{ published_count }} published</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 block">Pending Review</span>
+        <span class="text-2xl font-black text-amber-600 mt-1 block">{{ pending_count }}</span>
+        <span class="text-[10px] text-slate-400 mt-0.5 block">Awaiting approval</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 block">Rejected</span>
+        <span class="text-2xl font-black text-rose-600 mt-1 block">{{ rejected_count }}</span>
+        <span class="text-[10px] text-slate-400 mt-0.5 block">Audit flagged</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 block">Rented & Sold</span>
+        <span class="text-2xl font-black text-blue-600 mt-1 block">{{ rented_count|add:sold_count }}</span>
+        <span class="text-[10px] text-slate-400 mt-0.5 block">{{ rented_count }} Rented &bull; {{ sold_count }} Sold</span>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 block">Total Revenue</span>
+        <span class="text-xl font-black text-emerald-700 mt-1 block">₦{{ total_revenue|floatformat:0 }}</span>
+        <span class="text-[10px] text-slate-400 mt-0.5 block">{{ total_payments_count }} transactions</span>
+      </div>
+
+    </div>
+
+    <!-- Analytics & Moderation Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      
+      <!-- Pending Moderation Quick Review (2 Cols) -->
+      <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Listings Awaiting Moderation</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Submitted by agents requiring compliance verification</p>
+          </div>
+          <a href="{% url 'admin_pending_approvals' %}" class="text-xs font-bold text-brand-teal hover:underline">Full Queue ({{ pending_count }}) &rarr;</a>
+        </div>
+
+        <div class="divide-y divide-slate-100">
+          {% for prop in pending_properties %}
+            <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+              <div class="flex items-center space-x-3.5">
+                <img src="{{ prop.primary_image_url }}" alt="{{ prop.title }}" class="w-12 h-12 rounded-xl object-cover" onerror="this.onerror=null;this.src='/static/icons/property-placeholder.svg';">
+                <div class="min-w-0">
+                  <a href="{% url 'property_detail' slug=prop.slug %}" class="font-bold text-slate-900 text-xs sm:text-sm hover:text-brand-teal truncate block max-w-sm">
+                    {{ prop.title }}
+                  </a>
+                  <p class="text-[11px] text-slate-500 mt-0.5">
+                    Agent: <strong class="text-slate-800">{{ prop.agent.full_name }}</strong> &bull; {{ prop.neighbourhood }}, {{ prop.city }} &bull; <strong class="text-slate-900">{{ prop.formatted_price }}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-2 flex-shrink-0">
+                <a href="{% url 'admin_approve_property' property_id=prop.id %}" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors">
+                  Approve
+                </a>
+                <button onclick="openRejectModal('{{ prop.id }}', '{{ prop.title|escapejs }}')" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs border border-rose-200 transition-colors">
+                  Reject
+                </button>
+              </div>
+            </div>
+          {% empty %}
+            <div class="p-12 text-center text-xs text-slate-400">
+              No listings currently pending moderation. All caught up!
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Market Distribution Insights (1 Col) -->
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-6">
+        <div>
+          <h2 class="text-base font-bold text-slate-900 mb-1">Top Locations Distribution</h2>
+          <p class="text-xs text-slate-500 mb-4">Properties grouped by Nigerian State</p>
+
+          <div class="space-y-3">
+            {% for loc in location_distribution %}
+              <div>
+                <div class="flex justify-between text-xs font-semibold mb-1">
+                  <span class="text-slate-800">{{ loc.state }}</span>
+                  <span class="text-brand-teal font-bold">{{ loc.count }}</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-brand-teal h-2 rounded-full" style="width: {% widthratio loc.count total_properties 100 %}%"></div>
+                </div>
+              </div>
+            {% empty %}
+              <p class="text-xs text-slate-400">No location data yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Quick Navigation</h3>
+          <div class="space-y-2 text-xs font-semibold">
+            <a href="{% url 'admin_users' %}" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors">
+              <span>Registered Accounts Registry</span>
+              <span class="text-slate-400">&rarr;</span>
+            </a>
+            <a href="{% url 'admin_reports' %}" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors">
+              <span>Property Reports Queue</span>
+              <span class="text-slate-400">&rarr;</span>
+            </a>
+            <a href="{% url 'admin_transactions' %}" class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors">
+              <span>Financial Audit Ledger</span>
+              <span class="text-slate-400">&rarr;</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Rejection Modal -->
+<div id="admin-reject-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+    <h3 class="text-base font-bold text-slate-900 mb-2">Reject Property Listing</h3>
+    <p id="reject-prop-title" class="text-xs font-semibold text-slate-600 mb-4"></p>
+
+    <form id="reject-form" method="POST" action="">
+      {% csrf_token %}
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Reason for Rejection (Visible to Agent)</label>
+      <textarea name="reason" rows="3" required placeholder="State exact policy failure: e.g. Price misleading, watermarked image, lack of clear title document..." class="form-input text-xs"></textarea>
+      
+      <div class="mt-4 flex justify-end space-x-2">
+        <button type="button" onclick="document.getElementById('admin-reject-modal').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-slate-100 text-xs font-bold text-slate-700">Cancel</button>
+        <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 text-xs font-bold text-white shadow">Confirm Rejection</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openRejectModal(propId, propTitle) {
+    const modal = document.getElementById('admin-reject-modal');
+    const titleEl = document.getElementById('reject-prop-title');
+    const form = document.getElementById('reject-form');
+    titleEl.textContent = propTitle;
+    form.action = `/dashboard/admin-portal/approvals/${propId}/reject/`;
+    modal.classList.remove('hidden');
+  }
+</script>
+{% endblock %}

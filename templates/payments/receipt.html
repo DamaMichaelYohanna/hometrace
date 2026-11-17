@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Receipt: {{ payment.reference }} | Hometrace{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-slate-50 min-h-[85vh]">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Printable Receipt Container -->
+    <div class="bg-white p-8 sm:p-12 rounded-3xl border border-slate-200/80 shadow-xl relative overflow-hidden print:border-none print:shadow-none">
+      
+      <!-- Verified Stamp Graphic -->
+      <div class="absolute top-8 right-8 hidden sm:block">
+        <div class="border-2 border-emerald-500 text-emerald-600 uppercase font-black tracking-widest text-xs px-3 py-1 rounded-lg rotate-12 opacity-80">
+          ✓ Verified & Paid
+        </div>
+      </div>
+
+      <!-- Receipt Header -->
+      <div class="pb-6 border-b border-slate-100 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-navy to-brand-teal flex items-center justify-center text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold text-brand-navy tracking-tight">Home<span class="text-brand-teal">trace</span></span>
+          <span class="text-xs text-slate-400 block -mt-0.5">Official Transaction Receipt</span>
+        </div>
+      </div>
+
+      <!-- Receipt Metadata Grid -->
+      <div class="mt-6 grid grid-cols-2 gap-4 text-xs">
+        <div>
+          <span class="text-slate-400 block uppercase font-bold text-[10px] tracking-wider">Payment Reference</span>
+          <span class="font-mono font-bold text-slate-900 text-sm mt-0.5 block">{{ payment.reference }}</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block uppercase font-bold text-[10px] tracking-wider">Date & Time</span>
+          <span class="font-semibold text-slate-900 mt-0.5 block">{{ payment.verified_at|default:payment.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block uppercase font-bold text-[10px] tracking-wider">Customer Name</span>
+          <span class="font-semibold text-slate-900 mt-0.5 block">{{ payment.user.full_name }}</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block uppercase font-bold text-[10px] tracking-wider">Customer Email</span>
+          <span class="font-semibold text-slate-900 mt-0.5 block truncate">{{ payment.user.email }}</span>
+        </div>
+      </div>
+
+      <!-- Itemized Ledger -->
+      <div class="mt-8 pt-6 border-t border-slate-100">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-slate-400 uppercase text-[10px] border-b border-slate-100">
+              <th class="text-left pb-2">Description</th>
+              <th class="text-right pb-2">Amount (NGN)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-800 font-medium">
+            <tr>
+              <td class="py-3">
+                <span class="font-bold text-slate-900 block">{{ payment.get_purpose_display }}</span>
+                <span class="text-slate-500 text-[11px]">Paystack Reference: {{ payment.paystack_reference|default:payment.reference }}</span>
+              </td>
+              <td class="py-3 text-right font-bold text-slate-900">
+                ₦{{ payment.amount|floatformat:2 }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="border-t border-slate-200">
+              <td class="pt-4 text-sm font-extrabold text-slate-900">Total Paid:</td>
+              <td class="pt-4 text-right text-lg font-black text-brand-navy">
+                ₦{{ payment.amount|floatformat:2 }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Payment Channel & Footer Note -->
+      <div class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div>
+          <span>Channel: <strong class="text-slate-800 uppercase">{{ payment.channel|default:"Card" }}</strong></span>
+          <span class="mx-2">&bull;</span>
+          <span>Status: <strong class="text-emerald-600 font-bold">SUCCESS</strong></span>
+        </div>
+        <span class="text-[11px] text-slate-400">Hometrace Nigeria</span>
+      </div>
+
+    </div>
+
+    <!-- Print & Return Buttons (Hidden during browser print) -->
+    <div class="mt-8 flex items-center justify-center space-x-3 print:hidden">
+      <button onclick="window.print()" class="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs shadow-sm hover:bg-slate-50 transition-colors flex items-center space-x-1.5">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        <span>Print Receipt</span>
+      </button>
+
+      <a href="{% url 'payment_history' %}" class="px-5 py-2.5 rounded-xl bg-brand-teal text-white font-bold text-xs shadow hover:bg-teal-700 transition-colors">
+        Transaction History
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

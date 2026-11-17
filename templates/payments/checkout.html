@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout & Payment | Hometrace Paystack Gateway{% endblock %}
+
+{% block content %}
+<div class="py-12 bg-slate-50 min-h-[85vh]">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8 text-center max-w-lg mx-auto">
+      <div class="w-12 h-12 mx-auto rounded-2xl bg-teal-50 text-brand-teal flex items-center justify-center mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Hometrace Checkout</h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">Secure payment processing powered by Paystack Nigeria</p>
+    </div>
+
+    <div class="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/80 shadow-md">
+      
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="property_id" value="{% if selected_property %}{{ selected_property.id }}{% endif %}">
+
+        <!-- Package Selector Options -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Select Service Package</label>
+          
+          <div class="space-y-3">
+            {% for key, item in pricing_catalogue.items %}
+              <label class="flex items-start justify-between p-4 rounded-2xl border cursor-pointer transition-all {% if purpose == key %}border-brand-teal bg-teal-50/40 ring-2 ring-brand-teal/20{% else %}border-slate-200 hover:border-slate-300 bg-white{% endif %}">
+                <div class="flex items-start space-x-3">
+                  <input type="radio" name="purpose" value="{{ key }}" {% if purpose == key %}checked{% endif %} onchange="this.form.submit()" class="mt-1 text-brand-teal focus:ring-teal-500">
+                  <div>
+                    <span class="text-sm font-bold text-slate-900 block leading-tight">{{ item.title }}</span>
+                    <span class="text-xs text-slate-500 block mt-0.5">{{ item.description }}</span>
+                    {% if key == 'inspection_fee' and selected_property %}
+                      <span class="inline-block mt-1 text-[11px] font-semibold text-brand-teal">Property: {{ selected_property.title }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="text-right flex-shrink-0 ml-4">
+                  <span class="text-base font-extrabold text-brand-navy">₦{{ item.amount|floatformat:0 }}</span>
+                  <span class="text-[10px] text-slate-400 block font-semibold">NGN</span>
+                </div>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Order Summary Card -->
+        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 text-xs">
+          <div class="flex justify-between text-slate-600">
+            <span>Selected Service:</span>
+            <span class="font-bold text-slate-900">{{ catalog_item.title }}</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Customer Name:</span>
+            <span class="font-bold text-slate-900">{{ user.full_name }}</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Customer Email:</span>
+            <span class="font-bold text-slate-900">{{ user.email }}</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Gateway Processor:</span>
+            <span class="font-bold text-emerald-700">Paystack (Cards, Bank Transfer, USSD)</span>
+          </div>
+          <div class="pt-3 border-t border-slate-200 flex justify-between items-center text-sm">
+            <span class="font-bold text-slate-900">Total Amount Due:</span>
+            <span class="text-xl font-black text-brand-navy">₦{{ catalog_item.amount|floatformat:2 }}</span>
+          </div>
+        </div>
+
+        <!-- Security & Disclaimer Notice -->
+        <div class="flex items-start space-x-2 text-[11px] text-slate-400 leading-tight">
+          <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>All transactions are encrypted with 256-bit SSL and authenticated through Paystack. Hometrace does not store sensitive card PINs or CVVs.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-teal to-teal-700 hover:from-teal-700 hover:to-teal-800 text-white font-extrabold text-sm shadow-md transition-all flex items-center justify-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Proceed to Pay ₦{{ catalog_item.amount|floatformat:0 }} via Paystack</span>
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

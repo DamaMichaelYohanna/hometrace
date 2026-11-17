@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Platform Properties | Hometrace Admin{% endblock %}
+
+{% block content %}
+<div class="py-10 bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center space-x-2 text-xs text-slate-500 mb-1">
+          <a href="{% url 'admin_overview' %}" class="hover:underline">Admin Command</a>
+          <span>/</span>
+          <span class="text-slate-800 font-bold">All Properties</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">System Property Inventory</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Platform-wide listings across all agents, categories, and Nigerian locations</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex items-center space-x-2 text-xs font-bold">
+        <a href="{% url 'admin_properties' %}" class="px-3.5 py-2 rounded-xl transition-colors {% if status_filter == 'all' %}bg-slate-900 text-white{% else %}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{% endif %}">
+          All
+        </a>
+        <a href="{% url 'admin_properties' %}?status=approved" class="px-3.5 py-2 rounded-xl transition-colors {% if status_filter == 'approved' %}bg-brand-teal text-white{% else %}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{% endif %}">
+          Approved
+        </a>
+        <a href="{% url 'admin_properties' %}?status=pending" class="px-3.5 py-2 rounded-xl transition-colors {% if status_filter == 'pending' %}bg-amber-500 text-white{% else %}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{% endif %}">
+          Pending
+        </a>
+        <a href="{% url 'admin_properties' %}?status=rejected" class="px-3.5 py-2 rounded-xl transition-colors {% if status_filter == 'rejected' %}bg-rose-600 text-white{% else %}bg-white border border-slate-200 text-slate-700 hover:bg-slate-50{% endif %}">
+          Rejected
+        </a>
+      </div>
+    </div>
+
+    <!-- Properties Table Card -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
+            <tr>
+              <th class="py-3.5 px-6">Property</th>
+              <th class="py-3.5 px-6">Agent</th>
+              <th class="py-3.5 px-6">Category</th>
+              <th class="py-3.5 px-6">Price (NGN)</th>
+              <th class="py-3.5 px-6">Review Status</th>
+              <th class="py-3.5 px-6">Availability</th>
+              <th class="py-3.5 px-6 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+            {% for prop in properties %}
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-4 px-6">
+                  <div class="flex items-center space-x-3.5">
+                    <img src="{{ prop.primary_image_url }}" alt="{{ prop.title }}" class="w-12 h-12 rounded-xl object-cover flex-shrink-0" onerror="this.onerror=null;this.src='/static/icons/property-placeholder.svg';">
+                    <div class="min-w-0">
+                      <a href="{% url 'property_detail' slug=prop.slug %}" class="font-bold text-slate-900 hover:text-brand-teal transition-colors block truncate max-w-xs">
+                        {{ prop.title }}
+                      </a>
+                      <span class="text-[11px] text-slate-400 block">{{ prop.neighbourhood }}, {{ prop.city }}, {{ prop.state }}</span>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="py-4 px-6">
+                  <span class="font-bold text-slate-900 block">{{ prop.agent.full_name }}</span>
+                  <span class="text-[10px] text-brand-teal font-semibold block">{{ prop.agent.agent_profile.agency_name|default:prop.agent.email }}</span>
+                </td>
+
+                <td class="py-4 px-6 text-slate-600 font-semibold">
+                  {{ prop.category.name }}
+                </td>
+
+                <td class="py-4 px-6 font-extrabold text-slate-900">
+                  {{ prop.formatted_price }}
+                </td>
+
+                <td class="py-4 px-6">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if prop.approval_status == 'approved' %}bg-teal-50 text-teal-700{% elif prop.approval_status == 'pending' %}bg-amber-50 text-amber-700{% else %}bg-rose-50 text-rose-700{% endif %}">
+                    {{ prop.get_approval_status_display }}
+                  </span>
+                </td>
+
+                <td class="py-4 px-6">
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {% if prop.availability_status == 'available' %}bg-emerald-50 text-emerald-700{% else %}bg-slate-100 text-slate-700{% endif %}">
+                    {{ prop.get_availability_status_display }}
+                  </span>
+                </td>
+
+                <td class="py-4 px-6 text-right whitespace-nowrap space-x-2">
+                  <a href="{% url 'property_detail' slug=prop.slug %}" class="text-slate-500 hover:text-slate-900 font-bold">View</a>
+                  <a href="{% url 'property_edit' slug=prop.slug %}" class="text-brand-teal font-bold hover:underline">Edit</a>
+                  <a href="{% url 'property_delete' slug=prop.slug %}" class="text-rose-500 hover:text-rose-700 font-bold">Delete</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="7" class="py-12 text-center text-slate-400">No properties found.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
