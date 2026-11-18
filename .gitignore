@@ -7,6 +7,6 @@ __pycache__/
 .venv/
 env/
 media/cache/
-staticfiles/
+# staticfiles/ tracked for serverless static asset deployment
 .DS_Store
 Thumbs.db

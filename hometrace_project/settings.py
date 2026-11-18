@@ -171,6 +171,7 @@ STORAGES = {
         'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
+WHITENOISE_USE_FINDERS = True
 
 # Authentication Redirections
 LOGIN_URL = 'login'
