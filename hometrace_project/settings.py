@@ -157,11 +157,18 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media Files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# In Vercel serverless environments, the filesystem is read-only except for /tmp
+if IS_VERCEL:
+    MEDIA_ROOT = Path('/tmp/media')
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Storage configuration (WhiteNoise for static files, Cloudinary or local for media)
 if os.getenv('CLOUDINARY_URL'):
     INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL'),
+    }
 
 STORAGES = {
     'default': {
