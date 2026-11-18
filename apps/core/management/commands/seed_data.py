@@ -60,7 +60,19 @@ PHOTOS_LAND = [
 class Command(BaseCommand):
     help = 'Populates the database with realistic Keffi, Nasarawa State real estate data'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--if-empty',
+            action='store_true',
+            dest='if_empty',
+            help='Only seed data if no properties currently exist in the database',
+        )
+
     def handle(self, *args, **options):
+        if options.get('if_empty') and Property.objects.exists():
+            self.stdout.write(self.style.SUCCESS("Properties already exist in database. Skipping seed."))
+            return
+
         self.stdout.write(self.style.NOTICE("Initializing Hometrace Real Estate data for Keffi, Nasarawa State..."))
 
         # Clean existing demo properties to ensure pure Keffi data
@@ -718,8 +730,8 @@ class Command(BaseCommand):
                     'purpose': purp,
                     'status': st,
                     'channel': 'card',
-                    'property': sample_property if purp in (Payment.Purpose.INSPECTION_FEE, Payment.Purpose.LISTING_FEATURE) else None,
-                    'paid_at': timezone.now() - timezone.timedelta(days=random.randint(1, 10))
+                    'metadata': {'property_title': sample_property.title} if purp in (Payment.Purpose.INSPECTION_FEE, Payment.Purpose.LISTING_FEATURE) else {},
+                    'verified_at': timezone.now() - timezone.timedelta(days=random.randint(1, 10))
                 }
             )
 

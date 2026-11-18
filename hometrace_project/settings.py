@@ -32,6 +32,15 @@ ALLOWED_HOSTS = [h.strip() for h in os.getenv(
     'localhost,127.0.0.1,.vercel.app' if IS_VERCEL else 'localhost,127.0.0.1,*',
 ).split(',') if h.strip()]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+extra_csrf = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if extra_csrf:
+    CSRF_TRUSTED_ORIGINS.extend([origin.strip() for origin in extra_csrf.split(',') if origin.strip()])
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -87,17 +96,26 @@ WSGI_APPLICATION = 'hometrace_project.wsgi.application'
 
 # Database Configuration
 # PostgreSQL is supported when DATABASE_URL is set; otherwise use the bundled SQLite database.
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = (
+    os.getenv('DATABASE_URL')
+    or os.getenv('DATABASE_URL_UNPOOLED')
+    or os.getenv('POSTGRES_URL')
+)
 
 if DATABASE_URL:
     import dj_database_url
+    is_pooler = '-pooler' in DATABASE_URL or IS_VERCEL
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0 if is_pooler else 600,
             conn_health_checks=True,
         )
     }
+    if is_pooler:
+        DATABASES['default'].setdefault('OPTIONS', {})
+        DATABASES['default']['OPTIONS']['connect_timeout'] = 15
+        DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 else:
     DATABASES = {
         'default': {
@@ -141,16 +159,19 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Storage configuration (WhiteNoise for static files, Cloudinary or local for media)
 if os.getenv('CLOUDINARY_URL'):
     INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
-    STORAGES = {
-        'default': {
-            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
-        },
-        'staticfiles': {
-            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-        },
-    }
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage' if os.getenv('CLOUDINARY_URL') else 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+WHITENOISE_MANIFEST_STRICT = False
 
 # Authentication Redirections
 LOGIN_URL = 'login'
